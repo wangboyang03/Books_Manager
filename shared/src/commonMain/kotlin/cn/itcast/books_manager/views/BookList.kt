@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.sp
 import booksmanager.shared.generated.resources.Res
 import booksmanager.shared.generated.resources.images
 import cn.itcast.books_manager.models.BookItemResponse
+import cn.itcast.books_manager.views.components.NavigationTopBar
 import org.jetbrains.compose.resources.painterResource
 
 @Composable fun BookList(toBookEditor: (id: Int?) -> Unit = {}) {

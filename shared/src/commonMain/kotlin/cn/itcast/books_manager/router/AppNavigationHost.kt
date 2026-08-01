@@ -21,7 +21,9 @@ import cn.itcast.books_manager.views.BookList
       })
     }
     composable(RouterMap.BookEditor.route) {
-      BookEditor()
+      BookEditor({
+        controller.popBackStack()
+      })
     }
   }
 }

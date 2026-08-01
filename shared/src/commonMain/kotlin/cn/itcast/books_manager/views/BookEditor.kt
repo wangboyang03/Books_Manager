@@ -1,16 +1,13 @@
 package cn.itcast.books_manager.views
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
+import booksmanager.shared.generated.resources.Res
+import booksmanager.shared.generated.resources.icon_back
+import cn.itcast.books_manager.views.components.NavigationTopBar
 
-@Composable fun BookEditor() {
-  Box(Modifier.fillMaxSize(), Alignment.Center) {
-    Text("图书编辑页面", fontSize = 40.sp, fontWeight = FontWeight.Bold)
+@Composable fun BookEditor(onBack: () -> Unit = {}) {
+  Column {
+    NavigationTopBar("图书编辑页面", onBack, {}, {}, Res.drawable.icon_back, showRightIcon = false)
   }
 }
