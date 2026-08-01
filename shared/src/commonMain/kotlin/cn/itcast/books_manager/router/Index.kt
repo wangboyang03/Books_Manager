@@ -1,4 +1,4 @@
-package cn.itcast.books_manager.route
+package cn.itcast.books_manager.router
 
 sealed class RouterMap(val route: String) {
   object BookList : RouterMap("book_list")

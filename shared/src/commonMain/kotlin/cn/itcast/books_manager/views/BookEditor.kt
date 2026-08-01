@@ -8,7 +8,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import cn.itcast.books_manager.route.RouterMap
 
 @Composable fun BookEditor() {
   Box(Modifier.fillMaxSize(), Alignment.Center) {

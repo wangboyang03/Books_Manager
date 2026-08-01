@@ -14,36 +14,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
 import org.jetbrains.compose.resources.painterResource
 
 import booksmanager.shared.generated.resources.Res
 import booksmanager.shared.generated.resources.compose_multiplatform
+import cn.itcast.books_manager.router.AppNavigationHost
 
-@Composable
-@Preview
-fun App() {
+@Composable @Preview fun App() {
+  // 除了只读属性 控制器需要被记忆 避免重组时状态丢失 重新初始化
+  val navController = rememberNavController()
   MaterialTheme {
-    var showContent by remember { mutableStateOf(false) }
-    Column(
-      modifier = Modifier
-        .background(MaterialTheme.colorScheme.primaryContainer)
-        .safeContentPadding()
-        .fillMaxSize(),
-      horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-      Button(onClick = { showContent = !showContent }) {
-        Text("Click me!")
-      }
-      AnimatedVisibility(showContent) {
-        val greeting = remember { Greeting().greet() }
-        Column(
-          modifier = Modifier.fillMaxWidth(),
-          horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-          Image(painterResource(Res.drawable.compose_multiplatform), null)
-          Text("Compose: $greeting")
-        }
-      }
-    }
+    AppNavigationHost(navController)
   }
 }
