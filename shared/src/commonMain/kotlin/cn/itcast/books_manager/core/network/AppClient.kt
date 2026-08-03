@@ -20,12 +20,6 @@ class AppClient(@PublishedApi internal val client: HttpClient) {
         parameter(key, value)
       }
     }
-    /*val response = client.get(
-      "api/books?creator=6666"
-    )*/
-    println("url=$url")
-    println("status=${response.status}")
-    println("body=$response.bodyAsText()")
     return parseResponse<T>(response.bodyAsText())
   }
 
