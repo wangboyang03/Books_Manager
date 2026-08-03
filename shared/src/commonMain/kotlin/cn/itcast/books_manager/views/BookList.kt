@@ -15,6 +15,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -24,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import booksmanager.shared.generated.resources.Res
 import booksmanager.shared.generated.resources.images
 import cn.itcast.books_manager.models.BookItemResponse
+import cn.itcast.books_manager.models.apis.BookManagerApi
 import cn.itcast.books_manager.views.components.NavigationTopBar
 import org.jetbrains.compose.resources.painterResource
 
@@ -35,10 +39,21 @@ import org.jetbrains.compose.resources.painterResource
     BookItemResponse(4, "红楼梦", "曹雪芹", "某出版社")
   )
 
+  val data = remember { mutableStateListOf<BookItemResponse>() }
+
+  LaunchedEffect(Unit) {
+    try {
+      val _data = BookManagerApi.getBookListApi(mapOf("creator" to "涛哥"))
+      data.addAll(_data)
+    } catch (error: Exception) {
+      error.printStackTrace()
+    }
+  }
+
   Column(Modifier.fillMaxSize().safeContentPadding()) {
     NavigationTopBar("图书列表页", {}, {}, { toBookEditor(null) })
     LazyColumn() {
-      items(bookList) {item ->
+      items(data) {item ->
         BookCeil(item.bookname, item.author, item.publisher, { toBookEditor(item.id) })
       }
     }
