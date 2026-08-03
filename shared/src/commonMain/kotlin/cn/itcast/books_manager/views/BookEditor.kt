@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.HorizontalDivider
@@ -16,18 +17,33 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import booksmanager.shared.generated.resources.Res
 import booksmanager.shared.generated.resources.icon_back
+import cn.itcast.books_manager.ToastMessage
+import cn.itcast.books_manager.models.apis.BookManagerApi
 import cn.itcast.books_manager.views.components.NavigationTopBar
 
 @Composable fun BookEditor(onBack: () -> Unit = {}, id: String?) {
   val bookName = rememberTextFieldState("")
   val author = rememberTextFieldState("")
   val publisher = rememberTextFieldState("")
+
+  LaunchedEffect(Unit) {
+    if (id.isNullOrBlank()) return@LaunchedEffect // 如果id为空就跳出副作用区域
+    try {
+      val response = BookManagerApi.getBookDetailApi(id)
+      bookName.setTextAndPlaceCursorAtEnd(response.bookname)
+      author.setTextAndPlaceCursorAtEnd(response.author)
+      publisher.setTextAndPlaceCursorAtEnd(response.publisher)
+    } catch (error: Exception) {
+      error.message?.let { ToastMessage.openToast(it) }
+    }
+  }
 
   Column(Modifier.fillMaxWidth(), Arrangement.spacedBy(16.dp)) {
     NavigationTopBar(if (id?.isNotEmpty() ?: false) "编辑图书${id}页" else "新增图书页", onBack, {}, {}, Res.drawable.icon_back, showRightIcon = false)

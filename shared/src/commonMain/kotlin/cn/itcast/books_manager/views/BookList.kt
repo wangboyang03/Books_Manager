@@ -15,9 +15,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -27,22 +26,19 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import booksmanager.shared.generated.resources.Res
 import booksmanager.shared.generated.resources.images
-import cn.itcast.books_manager.ToastMessage
-import cn.itcast.books_manager.models.BookItemResponse
-import cn.itcast.books_manager.models.apis.BookManagerApi
 import cn.itcast.books_manager.viewmodels.BookViewModel
 import cn.itcast.books_manager.views.components.NavigationTopBar
 import org.jetbrains.compose.resources.painterResource
 
 @Composable fun BookList(toBookEditor: (id: Int?) -> Unit = {}, vm: BookViewModel = viewModel()) {
-  val bookList = listOf<BookItemResponse>(
+  /*val bookList = listOf<BookItemResponse>(
     BookItemResponse(1, "三国演义", "罗贯中", "某出版社"),
     BookItemResponse(2, "西游记", "吴承恩", "某出版社"),
     BookItemResponse(3, "水浒传", "施耐庵", "某出版社"),
     BookItemResponse(4, "红楼梦", "曹雪芹", "某出版社")
-  )
+  )*/
 
-  val data = remember { mutableStateListOf<BookItemResponse>() }
+  /*val data = remember { mutableStateListOf<BookItemResponse>() }
 
   LaunchedEffect(Unit) {
     try {
@@ -52,12 +48,14 @@ import org.jetbrains.compose.resources.painterResource
     } catch (error: Exception) {
       error.printStackTrace()
     }
-  }
+  }*/
+
+  val uiState by vm.uiState.collectAsState()
 
   Column(Modifier.fillMaxSize().safeContentPadding()) {
     NavigationTopBar("图书列表页", {}, {}, { toBookEditor(null) })
     LazyColumn() {
-      items(data) {item ->
+      items(uiState.dataList) {item ->
         BookCeil(item.bookname, item.author, item.publisher, { toBookEditor(item.id) })
       }
     }

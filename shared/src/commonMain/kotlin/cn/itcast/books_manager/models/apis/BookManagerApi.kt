@@ -13,13 +13,13 @@ object BookManagerApi {
   suspend fun addBookApi(data: BookRequest) {
     return appClient.post(Constants.GET_BOOK_LIST_API, data)
   }
-  suspend fun updateBookApi(id: Int, data: BookRequest) {
+  suspend fun updateBookApi(id: String, data: BookRequest) {
     return appClient.put("${Constants.GET_BOOK_LIST_API}/$id", data)
   }
-  suspend fun deleteBookApi(id: Int) {
+  suspend fun deleteBookApi(id: String) {
     return appClient.delete("${ Constants.GET_BOOK_LIST_API }/$id")
   }
-  suspend fun getBookDetailApi(id: Int): BookItemResponse {
+  suspend fun getBookDetailApi(id: String): BookItemResponse {
     return appClient.get<BookItemResponse>("${Constants.GET_BOOK_LIST_API}/$id")
   }
 }
