@@ -7,3 +7,8 @@ class IOSPlatform: Platform {
 }
 
 actual fun getPlatform(): Platform = IOSPlatform()
+
+actual object ToastMessage {
+  actual fun openToast(message: String) {
+  }
+}

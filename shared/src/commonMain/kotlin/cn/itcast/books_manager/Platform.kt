@@ -5,3 +5,7 @@ interface Platform {
 }
 
 expect fun getPlatform(): Platform
+
+expect object ToastMessage {
+  fun openToast(message: String)
+}

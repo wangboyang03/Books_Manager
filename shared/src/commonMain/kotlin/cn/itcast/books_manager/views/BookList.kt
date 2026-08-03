@@ -24,14 +24,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import booksmanager.shared.generated.resources.Res
 import booksmanager.shared.generated.resources.images
+import cn.itcast.books_manager.ToastMessage
 import cn.itcast.books_manager.models.BookItemResponse
 import cn.itcast.books_manager.models.apis.BookManagerApi
+import cn.itcast.books_manager.viewmodels.BookViewModel
 import cn.itcast.books_manager.views.components.NavigationTopBar
 import org.jetbrains.compose.resources.painterResource
 
-@Composable fun BookList(toBookEditor: (id: Int?) -> Unit = {}) {
+@Composable fun BookList(toBookEditor: (id: Int?) -> Unit = {}, vm: BookViewModel = viewModel()) {
   val bookList = listOf<BookItemResponse>(
     BookItemResponse(1, "三国演义", "罗贯中", "某出版社"),
     BookItemResponse(2, "西游记", "吴承恩", "某出版社"),
@@ -45,6 +48,7 @@ import org.jetbrains.compose.resources.painterResource
     try {
       val _data = BookManagerApi.getBookListApi(mapOf("creator" to "涛哥"))
       data.addAll(_data)
+      ToastMessage.openToast("获取图书列表成功")
     } catch (error: Exception) {
       error.printStackTrace()
     }
