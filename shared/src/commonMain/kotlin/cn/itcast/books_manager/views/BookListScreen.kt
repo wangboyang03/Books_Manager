@@ -3,6 +3,7 @@ package cn.itcast.books_manager.views
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -11,11 +12,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -60,7 +66,7 @@ fun randomBookImage(): DrawableResource = bookImages.random()
 fun BookCard(bookname: String, author: String, publisher: String, image: DrawableResource = randomBookImage(), onClick: () -> Unit = {}) {
   Column(Modifier.fillMaxWidth().clickable{ onClick() }.padding(10.dp)) {
     Image(painterResource(image), null, Modifier.fillMaxWidth().height(200.dp).clip(RoundedCornerShape(12.dp)), contentScale = ContentScale.Crop)
-    Text(bookname, Modifier.padding(top = 8.dp), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF23233C), maxLines = 2, overflow = TextOverflow.Ellipsis,)
+    Text(bookname, Modifier.padding(top = 8.dp), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF23233C), maxLines = 2, overflow = TextOverflow.Ellipsis)
     Text(author, Modifier.padding(top = 4.dp), fontSize = 13.sp, color = Color(0xFF9E9EB8), maxLines = 1, overflow = TextOverflow.Ellipsis)
     Text(publisher, Modifier.padding(top = 4.dp), fontSize = 13.sp, color = Color(0xFF9E9EB8), maxLines = 1, overflow = TextOverflow.Ellipsis)
   }
@@ -69,6 +75,8 @@ fun BookCard(bookname: String, author: String, publisher: String, image: Drawabl
 @Composable fun BookListScreen(goToManagerPage: (id: String?) -> Unit = {}, vm: BookListViewModel = viewModel()) {
 
   val bookListState by vm.bookListState.collectAsState()
+  var showConfirmDialog by remember { mutableStateOf(false) }
+  var currentDeletingId by remember { mutableStateOf("") }
 
   LaunchedEffect(Unit) {
     vm.getBookDatumList("wangbadan")
@@ -79,10 +87,55 @@ fun BookCard(bookname: String, author: String, publisher: String, image: Drawabl
 
     LazyColumn {
       items(bookListState.response, key = { it.id }) { book ->
-        SwipeToDelete(onDelete = { vm.deleteCurrentBookDatumAndReloadList(book.id.toString(), "wangbadan") }) {
+        SwipeToDelete(onDelete = {
+          currentDeletingId = book.id.toString()
+          showConfirmDialog = true
+        }) {
           BookCard(book.bookname, book.author, book.publisher, onClick = { goToManagerPage(book.id.toString()) })
         }
       }
     }
+  }
+
+  // 删除完成后自动关闭弹窗
+  LaunchedEffect(bookListState.isDeleting) {
+    if (!bookListState.isDeleting && currentDeletingId.isNotEmpty()) {
+      currentDeletingId = ""
+      showConfirmDialog = false
+    }
+  }
+
+  when(showConfirmDialog) {
+    true -> {
+      AlertDialog(
+        {
+          if (!bookListState.isDeleting) {
+            currentDeletingId = ""
+            showConfirmDialog = false
+          }
+        }, {
+          TextButton({
+            vm.deleteCurrentBookDatumAndReloadList(currentDeletingId, "wangbadan")
+          }) {
+            Text("确定")
+          }
+        }, dismissButton = {
+          TextButton({
+            if (!bookListState.isDeleting) {
+              currentDeletingId = ""
+              showConfirmDialog = false
+            }
+          }) {
+            Text("取消")
+          }
+        }, title = {
+          Text(if (bookListState.isDeleting) "正在删除" else "删除图书")
+        }, text = {
+          Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text("确定删除该图书吗？删除后无法恢复。")
+          }
+        })
+    }
+    false -> {}
   }
 }
