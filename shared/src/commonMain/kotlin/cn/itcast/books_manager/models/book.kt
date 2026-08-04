@@ -45,3 +45,7 @@ import kotlinx.serialization.Serializable
    */
   val publisher: String
 )
+
+@Serializable data class BookDeleteResponse(
+  val id: String
+)

@@ -12,7 +12,8 @@ import kotlinx.coroutines.launch
 
 data class BookListState(
   val isLoading: Boolean = false, // 是否正在加载中
-  val response: List<BookDatumResponse> = emptyList()
+  val response: List<BookDatumResponse> = emptyList(),
+  val isDeleting: Boolean = false // 是否正在删除中
 )
 
 class BookListViewModel: ViewModel() {
@@ -37,6 +38,31 @@ class BookListViewModel: ViewModel() {
       } finally {
         _bookListState.update {
           it.copy(false)
+        }
+      }
+    }
+  }
+
+  /**
+   * 删除当前图书
+   */
+  fun deleteCurrentBookDatumAndReloadList(id: String, currentCreator: String){
+    viewModelScope.launch {
+      if (id.isBlank()) return@launch
+      if (_bookListState.value.isDeleting) return@launch
+      _bookListState.update {
+        it.copy(isDeleting = true)
+      }
+      try {
+        // 删除当前图书
+        val response = BookManagerApi.deleteCurrentBookApi(id)
+        getBookDatumList(currentCreator)
+        ToastMessage("删除成功")
+      } catch (error: Exception) {
+        error.message?.let { ToastMessage(it) }
+      } finally {
+        _bookListState.update {
+          it.copy(isDeleting = false)
         }
       }
     }

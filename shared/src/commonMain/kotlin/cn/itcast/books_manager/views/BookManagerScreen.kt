@@ -69,7 +69,7 @@ import kotlinx.coroutines.launch
   Column(Modifier.fillMaxSize(), Arrangement.spacedBy(10.dp)) {
     NavigationBar(titleName, Res.drawable.icon_popback, Res.drawable.icon_checkmark, onLiftClick = onBackPage, onRightClick = {
       scope.launch {
-        vm.savedCurrentBookDatum(BookDatumRequest(author, bookName, "涛哥", publisher), id)
+        vm.savedCurrentBookDatum(BookDatumRequest(author, bookName, "wangbadan", publisher), id)
       }
     },)
     Spacer(Modifier.height(16.dp))

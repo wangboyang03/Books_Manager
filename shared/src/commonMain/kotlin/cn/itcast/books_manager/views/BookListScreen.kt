@@ -37,6 +37,7 @@ import booksmanager.shared.generated.resources.book_8
 import booksmanager.shared.generated.resources.book_9
 import cn.itcast.books_manager.viewmodels.BookListViewModel
 import cn.itcast.books_manager.views.components.NavigationBar
+import cn.itcast.books_manager.views.components.SwipeToDelete
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
@@ -57,7 +58,7 @@ fun randomBookImage(): DrawableResource = bookImages.random()
 
 @Composable
 fun BookCard(bookname: String, author: String, publisher: String, image: DrawableResource = randomBookImage(), onClick: () -> Unit = {}) {
-  Column(Modifier.fillMaxSize().clickable{ onClick() }.padding(10.dp)) {
+  Column(Modifier.fillMaxWidth().clickable{ onClick() }.padding(10.dp)) {
     Image(painterResource(image), null, Modifier.fillMaxWidth().height(200.dp).clip(RoundedCornerShape(12.dp)), contentScale = ContentScale.Crop)
     Text(bookname, Modifier.padding(top = 8.dp), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color(0xFF23233C), maxLines = 2, overflow = TextOverflow.Ellipsis,)
     Text(author, Modifier.padding(top = 4.dp), fontSize = 13.sp, color = Color(0xFF9E9EB8), maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -70,15 +71,17 @@ fun BookCard(bookname: String, author: String, publisher: String, image: Drawabl
   val bookListState by vm.bookListState.collectAsState()
 
   LaunchedEffect(Unit) {
-    vm.getBookDatumList("涛哥")
+    vm.getBookDatumList("wangbadan")
   }
 
   Column(Modifier.fillMaxSize().background(Color.Transparent)) {
     NavigationBar("图书列表", onRightClick = { goToManagerPage(null) } )
 
     LazyColumn {
-      items(bookListState.response) {
-        BookCard(it.bookname, it.author, it.publisher, onClick = { goToManagerPage(it.id.toString()) })
+      items(bookListState.response, key = { it.id }) { book ->
+        SwipeToDelete(onDelete = { vm.deleteCurrentBookDatumAndReloadList(book.id.toString(), "wangbadan") }) {
+          BookCard(book.bookname, book.author, book.publisher, onClick = { goToManagerPage(book.id.toString()) })
+        }
       }
     }
   }

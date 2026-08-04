@@ -57,8 +57,10 @@ class AppClient(val client: HttpClient) {
 
   suspend inline fun <reified T>delete(url: String, data: Any? = null): T {
     val response = client.delete(url) {
-      contentType(ContentType.Application.Json)
-      setBody(data)
+      if (data != null) {
+        contentType(ContentType.Application.Json)
+        setBody(data)
+      }
     }
     return parseResponse<T>(response.bodyAsText())
   }
