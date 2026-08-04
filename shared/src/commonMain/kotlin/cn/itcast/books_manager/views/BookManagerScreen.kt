@@ -2,18 +2,37 @@ package cn.itcast.books_manager.views
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import booksmanager.shared.generated.resources.Res
+import booksmanager.shared.generated.resources.icon_checkmark
+import booksmanager.shared.generated.resources.icon_popback
+import cn.itcast.books_manager.views.components.FormItem
+import cn.itcast.books_manager.views.components.NavigationBar
 
 @Composable fun BookManagerScreen(id: String?, onBackPage: () -> Unit = {}) {
-  Column(Modifier.fillMaxSize(), Arrangement.Center, Alignment.CenterHorizontally) {
-    Text("图书管理页面$id")
-    Button(onBackPage) {
-      Text("返回上一页")
-    }
+  val titleName = when (id) {
+    null -> "请输入您想要新增的图书信息"
+    else -> "您现在正在修改${id}图书信息"
+  }
+
+  var bookName by remember { mutableStateOf("") }
+  var author by remember { mutableStateOf("") }
+  var publisher by remember { mutableStateOf("") }
+
+  Column(Modifier.fillMaxSize(), Arrangement.spacedBy(10.dp)) {
+    NavigationBar(titleName, Res.drawable.icon_popback, Res.drawable.icon_checkmark, onLiftClick = onBackPage, onRightClick = {},)
+    Spacer(Modifier.height(16.dp))
+    FormItem(label = "图书名称", value = bookName, onValueChange = { bookName = it }, placeholder = "请输入图书名称")
+    FormItem(label = "图书作者", value = author, onValueChange = { author = it }, placeholder = "请输入作者")
+    FormItem(label = "出版社", value = publisher, onValueChange = { publisher = it }, placeholder = "请输入出版社")
   }
 }
