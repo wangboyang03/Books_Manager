@@ -6,6 +6,7 @@ plugins {
   alias(libs.plugins.androidMultiplatformLibrary)
   alias(libs.plugins.composeMultiplatform)
   alias(libs.plugins.composeCompiler)
+  alias(libs.plugins.kotlinSerialization)
 }
 
 kotlin {
@@ -53,6 +54,8 @@ kotlin {
     androidMain.dependencies {
       implementation(libs.compose.uiToolingPreview)
       implementation(libs.compose.uiTooling)
+      // 安卓侧需要okHttp客户端
+      implementation(libs.ktor.client.okhttp)
     }
     commonMain.dependencies {
       implementation(libs.compose.runtime)
@@ -64,7 +67,11 @@ kotlin {
       implementation(libs.androidx.lifecycle.viewmodelCompose)
       implementation(libs.androidx.lifecycle.runtimeCompose)
       implementation(libs.navigation.compose) // 添加Navigation依赖
-
+      // 网络请求核心及依赖
+      implementation(libs.ktor.client.core)
+      implementation(libs.ktor.client.content.negotiation)
+      implementation(libs.ktor.serialization.kotlinx.json)
+      implementation(libs.ktor.client.logging)
     }
     commonTest.dependencies {
       implementation(libs.kotlin.test)

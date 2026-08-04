@@ -13,6 +13,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -21,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import booksmanager.shared.generated.resources.Res
 import booksmanager.shared.generated.resources.book_1
 import booksmanager.shared.generated.resources.book_2
@@ -31,7 +35,7 @@ import booksmanager.shared.generated.resources.book_6
 import booksmanager.shared.generated.resources.book_7
 import booksmanager.shared.generated.resources.book_8
 import booksmanager.shared.generated.resources.book_9
-import cn.itcast.books_manager.models.BookDatumResponse
+import cn.itcast.books_manager.viewmodels.BookListViewModel
 import cn.itcast.books_manager.views.components.NavigationBar
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
@@ -61,22 +65,20 @@ fun BookCard(bookname: String, author: String, publisher: String, image: Drawabl
   }
 }
 
-@Composable fun BookListScreen(goToManagerPage: (id: String?) -> Unit = {}) {
+@Composable fun BookListScreen(goToManagerPage: (id: String?) -> Unit = {}, vm: BookListViewModel = viewModel()) {
 
-  val list = listOf<BookDatumResponse>(
-    BookDatumResponse("涛哥出品", "我的兄弟叫顺溜", "1","太牛逼"),
-    BookDatumResponse("涛哥出品", "我的兄弟叫顺溜", "2","太牛逼"),
-    BookDatumResponse("涛哥出品", "我的兄弟叫顺溜", "3","太牛逼"),
-    BookDatumResponse("涛哥出品", "我的兄弟叫顺溜", "4","太牛逼"),
-    BookDatumResponse("涛哥出品", "我的兄弟叫顺溜", "5","太牛逼"),
-    BookDatumResponse("涛哥出品", "我的兄弟叫顺溜", "6","太牛逼")
-  )
+  val bookListState by vm.bookListState.collectAsState()
+
+  LaunchedEffect(Unit) {
+    vm.getBookDatumList("涛哥")
+  }
+
   Column(Modifier.fillMaxSize().background(Color.Transparent)) {
     NavigationBar("图书列表", onRightClick = { goToManagerPage(null) } )
 
     LazyColumn {
-      items(list) {
-        BookCard(it.bookname, it.author, it.publisher, onClick = { goToManagerPage(it.id) })
+      items(bookListState.response) {
+        BookCard(it.bookname, it.author, it.publisher, onClick = { goToManagerPage(it.id.toString()) })
       }
     }
   }
