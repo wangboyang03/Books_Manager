@@ -3,11 +3,13 @@ package cn.itcast.books_manager.core.network
 import cn.itcast.books_manager.models.Constants
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.DEFAULT
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
 object HttpClientFactory {
@@ -31,6 +33,9 @@ object HttpClientFactory {
     return HttpClient {
       defaultRequest {
         url(BASE_URL)
+      }
+      install(ContentNegotiation) {
+        json(JSON) // 把请求体数据进行序列化
       }
       install(HttpTimeout) {
         // 默认请求配置 配置基地址在defaultRequest中配置

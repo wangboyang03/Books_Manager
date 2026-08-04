@@ -1,14 +1,17 @@
 package cn.itcast.books_manager.views
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
@@ -23,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,8 +34,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import booksmanager.shared.generated.resources.Res
 import booksmanager.shared.generated.resources.icon_back
+import cn.itcast.books_manager.models.BookRequest
 import cn.itcast.books_manager.viewmodels.BookManagerViewModel
 import cn.itcast.books_manager.views.components.NavigationTopBar
+import kotlinx.coroutines.launch
 
 @Composable fun BookEditor(onBack: () -> Unit = {}, id: String?, vm: BookManagerViewModel = viewModel()) {
   val bookName = rememberTextFieldState("")
@@ -39,6 +45,7 @@ import cn.itcast.books_manager.views.components.NavigationTopBar
   val publisher = rememberTextFieldState("")
 
   val uiState by vm.uiState.collectAsState()
+  val scope = rememberCoroutineScope()
 
   LaunchedEffect(Unit) {
     if (id.isNullOrBlank()) return@LaunchedEffect // 如果id为空就跳出副作用区域
@@ -76,7 +83,19 @@ import cn.itcast.books_manager.views.components.NavigationTopBar
           disabledContainerColor = Color(0xFF000000),
           disabledContentColor = Color(0xFF000000)
         )) {
-          Text("保存", color = Color(0xFFFFFFFF))
+          Text("保存", Modifier.clickable {
+            scope.launch {
+              vm.newOrEditorBookItem(BookRequest(author.text.toString(), bookName.text.toString(), "涛哥", publisher.text.toString()), id)
+              onBack()
+            }
+          }, color = Color(0xFFFFFFFF))
+        }
+        if(uiState.saving) {
+          Column(Modifier.height(100.dp).width(100.dp), verticalArrangement = Arrangement.Center ) {
+            CircularProgressIndicator()
+            Spacer(Modifier.height(10.dp))
+            Text("保存中...")
+          }
         }
       }
     }
