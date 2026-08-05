@@ -28,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -41,9 +42,13 @@ import booksmanager.shared.generated.resources.book_6
 import booksmanager.shared.generated.resources.book_7
 import booksmanager.shared.generated.resources.book_8
 import booksmanager.shared.generated.resources.book_9
+import booksmanager.shared.generated.resources.icon_list
+import booksmanager.shared.generated.resources.icon_picture
 import cn.itcast.books_manager.viewmodels.BookListViewModel
 import cn.itcast.books_manager.views.components.NavigationBar
 import cn.itcast.books_manager.views.components.SwipeToDelete
+import cn.itcast.books_manager.views.components.WaterFlow
+import cn.itcast.books_manager.views.components.WaterFlowCard
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
@@ -77,21 +82,37 @@ fun BookCard(bookname: String, author: String, publisher: String, image: Drawabl
   val bookListState by vm.bookListState.collectAsState()
   var showConfirmDialog by remember { mutableStateOf(false) }
   var currentDeletingId by remember { mutableStateOf("") }
+  var isWaterFlow by remember { mutableStateOf(false) }
 
   LaunchedEffect(Unit) {
     vm.getBookDatumList("wangbadan")
   }
 
-  Column(Modifier.fillMaxSize().background(Color.Transparent)) {
-    NavigationBar("图书列表", onRightClick = { goToManagerPage(null) } )
+  // 每本图书的瀑布流图片高度，按 id 取模得到不同高度，形成错落效果
+  val waterfallImageHeight: (Int) -> Dp = { id ->
+    when (id % 3) {
+      0 -> 140.dp
+      1 -> 200.dp
+      else -> 160.dp
+    }
+  }
 
-    LazyColumn {
-      items(bookListState.response, key = { it.id }) { book ->
-        SwipeToDelete(onDelete = {
-          currentDeletingId = book.id.toString()
-          showConfirmDialog = true
-        }) {
-          BookCard(book.bookname, book.author, book.publisher, onClick = { goToManagerPage(book.id.toString()) })
+  Column(Modifier.fillMaxSize().background(Color.Transparent)) {
+    NavigationBar("图书列表", if (isWaterFlow) Res.drawable.icon_list else Res.drawable.icon_picture, onLiftClick = { isWaterFlow = !isWaterFlow }, onRightClick = { goToManagerPage(null) })
+
+    if (isWaterFlow) {
+      WaterFlow(items = bookListState.response, estimateHeight = { item, _ -> waterfallImageHeight(item.id).value + 80f },) { book, _ ->
+        WaterFlowCard(book.bookname, book.author, book.publisher, image = randomBookImage(), imageHeight = waterfallImageHeight(book.id), onClick = { goToManagerPage(book.id.toString()) })
+      }
+    } else {
+      LazyColumn {
+        items(bookListState.response, key = { it.id }) { book ->
+          SwipeToDelete(onDelete = {
+            currentDeletingId = book.id.toString()
+            showConfirmDialog = true
+          }) {
+            BookCard(book.bookname, book.author, book.publisher, onClick = { goToManagerPage(book.id.toString()) })
+          }
         }
       }
     }
